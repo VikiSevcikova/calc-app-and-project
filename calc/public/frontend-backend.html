@@ -1,2 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Calculator</title>
+		<h1 style="text-align: center">Calculator</h1>
+			<style>
+				#calc-contain{
+					position: relative;
+					width: 300px;
+					border: 1px solid black;
+					border-radius: 4px;
+					background: #b1b1b1;
+					padding: 20px;
+				}
+				input[type=button]{
+					background: rgb(158, 158, 158);
+					width: 20%;
+					font-size: 20px;
+					font-weight: 900;
+					margin: 2%;
+					border-radius: 4px;
+				}
+				input[type=text]{
+					position: relative;
+					display: block;
+					border-radius: 4px;
+					width: 95%;
+					height: 100px;
+					margin: 15px auto 10px auto;
+					font-size: 30px;
+					background: #161C2E;
+					color: #CDE3EB;
+				}
+			</style>
+                <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+				<script text='text/javascript'>
+					function backspace(){
+						let x = calculator.display.value; 
+						if(x.length > 0){
+							x = x.substring(0, x.length-1); 
+							calculator.display.value = x;
+						}
+					}
 
-Implement your own Frontend Calculator that will 'call your api' in order to get results
+                    async function calculate(input){
+                        let operations = ['+','-','/','x','%'];
+                        let output;
+
+                        for (let i = 0; i < operations.length; i++) {
+                            // Regular Expression to look for operators between floating numbers or integers
+                            let reg = new RegExp('(\\d+\\.?\\d*)([\\' + operations[i] + '])(\\d+\\.?\\d*)');
+                            reg.lastIndex = 0; // take precautions and reset reg starting pos
+                            if (reg.test(input)) {
+                                output = await fetchApi(RegExp.$1, RegExp.$2, RegExp.$3);
+                                console.log(output);
+                                return output;
+                            }
+                        }
+                        return output;
+                    }
+
+                    async function fetchApi(num1, op, num2){
+                            let url;
+                            let output;
+                            switch (op) {
+                                case '+':
+                                    url = `/api/add/${num1}/${num2}`;
+                                    break;
+                                case '-':
+                                    url = `/api/subtract/${num1}/${num2}`;
+                                    break;
+                                case '/':
+                                    url = `/api/divide/${num1}/${num2}`;
+                                    break;
+                                case 'x':
+                                    url = `/api/multiply/${num1}/${num2}`;
+                                    break;
+                                case '%':
+                                    url = `/api/mod/${num1}/${num2}`;
+                                    break;
+                                default:
+                                    return;
+                                }
+                                try{
+                                    console.log(url)
+                                    let response = await axios.get(url);
+                                    return response.data;
+                                }catch (error){
+                                    console.error(error);
+                                    return 'error';
+                                }
+                        }
+
+				</script>
+	</head>
+	<body>
+		<center>
+			<div id="calc-contain">
+				<form name="calculator">
+					<input type="text" name="display"/>
+                    <br/>
+					<input type="button" value=" ( " onclick="calculator.display.value +='('" style = "background: rgb(122, 122, 122)"/>
+					<input type="button" value=" ) " onclick="calculator.display.value +=')'" style = "background: rgb(122, 122, 122)"/>
+					<input type="button" value=" % " onclick="calculator.display.value +='%'" style = "background: rgb(122, 122, 122)"/>
+					<input type="button" value=" CE " onclick="backspace()" style = "background: rgb(122, 122, 122)"/>
+					<br/>
+					<input type="button" value=" 7 " onclick="calculator.display.value +='7'"/>
+					<input type="button" value=" 8 " onclick="calculator.display.value +='8'"/>
+					<input type="button" value=" 9 " onclick="calculator.display.value +='9'"/>
+					<input type="button" value=" / " onclick="calculator.display.value +='/'" style = "background: rgb(122, 122, 122)"/>
+					<br/>
+					<input type="button" value=" 4 " onclick="calculator.display.value +='4'"/>
+					<input type="button" value=" 5 " onclick="calculator.display.value +='5'"/>
+					<input type="button" value=" 6 " onclick="calculator.display.value +='6'"/>
+					<input type="button" value=" x " onclick="calculator.display.value +='x'" style = "background: rgb(122, 122, 122)"/>
+					<br/>
+					<input type="button" value=" 1 " onclick="calculator.display.value +='1'"/>
+					<input type="button" value=" 2 " onclick="calculator.display.value +='2'"/>
+					<input type="button" value=" 3 " onclick="calculator.display.value +='3'"/>
+					<input type="button" value=" - " onclick="calculator.display.value +='-'" style = "background: rgb(122, 122, 122)"/>
+					<br/>
+					<input type="button" value=" 0 " onclick="calculator.display.value ='0'"/>
+					<input type="button" value=" . " onclick="calculator.display.value +='.'"/>
+					<input type="button" value=" = " onclick="calculate(calculator.display.value).then(response => {calculator.display.value = response})"/>
+					<input type="button" value=" + " onclick="calculator.display.value +='+'" style = "background: rgb(122, 122, 122)"/>
+					<br/>
+				</form>
+			</div>
+		</center>	
+	</body>	
+</html>
